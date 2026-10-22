@@ -86,6 +86,10 @@ section:not(.dark) details p {
 .social-description small{color:#534740;font-size:.86rem;overflow-wrap:anywhere;line-height:1.55}
 .social-arrow{flex:none;color:#9f2b68;font-size:1.3rem}
 @media(max-width:740px){.social-grid{grid-template-columns:1fr}.social-section{padding:65px 0}.social-link{padding:19px 17px;gap:14px}.social-icon{width:46px;height:46px}}
+
+/* Zgoda na analitykę i marketing */
+.cookie-panel{position:fixed;z-index:1000;left:18px;right:18px;bottom:18px;max-width:690px;margin:auto;padding:22px 24px;background:#fffdfa;color:#28221f;border:1px solid #ded4c9;box-shadow:0 12px 45px #1f171733;border-radius:18px;display:none}
+.cookie-panel.is-visible{display:block}.cookie-panel p{color:#382f2a;font-size:.91rem;line-height:1.55;margin:8px 0 16px}.cookie-actions{display:flex;flex-wrap:wrap;gap:10px}.cookie-actions button{border:1px solid #8f174f;border-radius:7px;padding:11px 18px;background:#8f174f;color:white;cursor:pointer;font-weight:700}.cookie-actions button.cookie-reject{background:white;color:#651039}.privacy-link{border:0;background:transparent;text-decoration:underline;color:#651039;cursor:pointer;font:inherit;padding:0}@media(max-width:520px){.cookie-panel{padding:17px}.cookie-actions button{flex:1}}
 </style>
 </head>
 <body>
@@ -131,7 +135,41 @@ section:not(.dark) details p {
   </div>
 </section>
 </main>
-<footer class="footer"><div class="wrap footergrid"><strong class="logo">BeautyExpert<span>Online.</span></strong><span>Mentoring 1:1 · Edukacja i pielęgnacja skóry</span><span>© <span id="year">2026</span> BeautyExpertOnline</span></div></footer>
+<aside class="cookie-panel" id="cookie-panel" role="dialog" aria-modal="false" aria-label="Wybór zgody na pliki cookie" aria-live="polite"><strong>Twoja prywatność jest ważna</strong><p>Za Twoją zgodą używam Meta Pixel do mierzenia odwiedzin strony i kliknięć formularza. Możesz odmówić — strona i formularz nadal będą działały. Nie wysyłam do Meta treści formularza ani danych o zdrowiu.</p><div class="cookie-actions"><button type="button" id="cookie-accept">Zgadzam się</button><button type="button" class="cookie-reject" id="cookie-reject">Nie zgadzam się</button></div></aside>
+
+<footer class="footer"><div class="wrap footergrid"><strong class="logo">BeautyExpert<span>Online.</span></strong><span>Mentoring 1:1 · Edukacja i pielęgnacja skóry</span><span><button type="button" class="privacy-link" id="cookie-settings">Ustawienia prywatności</button><span>© <span id="year">2026</span> BeautyExpertOnline</span></div></footer>
 <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+<script>
+(function(){
+  'use strict';
+  var PIXEL_ID='1488660652414950';
+  var KEY='beo_meta_pixel_consent_v1';
+  var panel=document.getElementById('cookie-panel');
+  var enabled=false;
+  function initializePixel(){
+    if(enabled) return;
+    enabled=true;
+    /* Kod Meta Pixel ładuje się wyłącznie po udzieleniu zgody. */
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];
+    t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+    (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init',PIXEL_ID);
+    fbq('track','PageView');
+    fbq('track','ViewContent');
+  }
+  function readConsent(){try{return localStorage.getItem(KEY)}catch(e){return null}}
+  function saveConsent(value){try{localStorage.setItem(KEY,value)}catch(e){}}
+  function choose(value){saveConsent(value);panel.classList.remove('is-visible');if(value==='yes')initializePixel()}
+  var choice=readConsent();
+  if(choice==='yes')initializePixel();else if(choice!=='no')panel.classList.add('is-visible');
+  document.getElementById('cookie-accept').addEventListener('click',function(){choose('yes')});
+  document.getElementById('cookie-reject').addEventListener('click',function(){choose('no')});
+  document.getElementById('cookie-settings').addEventListener('click',function(){panel.classList.add('is-visible')});
+  document.querySelectorAll('a[href*="tiny.pl/wvq5spv44"]').forEach(function(link){link.addEventListener('click',function(){
+    if(enabled&&window.fbq){fbq('trackCustom','MentoringApplicationClick')}
+  })});
+})();
+</script>
 </body>
 </html>
